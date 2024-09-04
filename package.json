@@ -1,0 +1,39 @@
+{
+  "$schema": false,
+  "name": "fullstack-sern",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec babel-node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phnik/learn-fullstack-SERN.git"
+  },
+  "keywords": [
+    "fullstack",
+    "nodejs"
+  ],
+  "author": "datnguyen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phnik/learn-fullstack-SERN/issues"
+  },
+  "homepage": "https://github.com/phnik/learn-fullstack-SERN#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.10",
+    "nodemon": "^2.0.7",
+    "sequelize-cli": "^6.2.0"
+  }
+}
