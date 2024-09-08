@@ -11,7 +11,7 @@ app.use(express.urlencoded({extended: true}));
 viewEngine(app);
 initWebRoutes(app);
 
-connectDB();
+// connectDB();
 
 let port = process.env.PORT || 6969;
 app.listen(port, () =>{

@@ -8,10 +8,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-        // key: DataTypes.STRING,
-        // type: DataTypes.STRING,
-        // value_en: DataTypes.STRING,
-        // value_vi: DataTypes.STRING
       key: {
         type: Sequelize.STRING
       },
