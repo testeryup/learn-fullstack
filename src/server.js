@@ -15,5 +15,5 @@ initWebRoutes(app);
 
 let port = process.env.PORT || 6969;
 app.listen(port, () =>{
-    console.log("running server at port:", port);
+    console.log("Running server at port:", port);
 })

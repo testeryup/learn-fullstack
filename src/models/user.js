@@ -1,5 +1,5 @@
 'use strict';
-const { BOOLEAN } = require('sequelize');
+
 const {
   Model
 } = require('sequelize');
