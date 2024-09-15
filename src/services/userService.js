@@ -15,13 +15,13 @@ let handleUserLogin = (email, password) => {
             })
 
             if (isExit) {
-                let check = await bcrypt.compareSync(password, user.password);
+                let check = bcrypt.compareSync(password, user.password);
                 if (check) {
                     userData.errCode = 0;
                     userData.errMessage = 'ok';
 
                     delete user.password;
-                    
+
                     userData.user = user;
                 }
                 else{
