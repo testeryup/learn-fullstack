@@ -93,9 +93,9 @@ let createNewUser = (data) => {
         try {
             let check = await checkUserEmail(data.email);
             if (check === true) {
-                resolve({
+                return resolve({
                     errCode: 1,
-                    message: "Your email is already registerd before!"
+                    errMessage: "Your email is already registerd before!"
                 })
             }
 
