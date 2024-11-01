@@ -12,7 +12,7 @@ let handleUserLogin = (email, password) => {
             let isExit = await checkUserEmail(email);
 
             let user = await db.User.findOne({
-                where: {email: email},
+                where: { email: email },
                 attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
                 raw: true
             })
@@ -27,12 +27,12 @@ let handleUserLogin = (email, password) => {
 
                     userData.user = user;
                 }
-                else{
+                else {
                     userData.errCode = 3;
                     userData.errMessage = 'Wrong password!';
                 }
             }
-            else{
+            else {
                 userData.errCode = 1;
                 userData.errMessage = `User does not exist!`;
             }
@@ -48,12 +48,12 @@ let checkUserEmail = (userEmail) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await db.User.findOne({
-                where: {email: userEmail}
+                where: { email: userEmail }
             })
             if (user) {
                 resolve(true);
             }
-            else{
+            else {
                 resolve(false);
             }
         } catch (e) {
@@ -66,17 +66,17 @@ const getAllUsers = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let users = '';
-            if(userId === 'ALL'){
+            if (userId === 'ALL') {
                 users = await db.User.findAll({
-                    attributes:{
+                    attributes: {
                         exclude: ['password']
                     },
                 })
             }
-            if(userId && userId !== 'ALL'){
+            if (userId && userId !== 'ALL') {
                 users = await db.User.findOne({
-                    where: {id: userId},
-                    attributes:{
+                    where: { id: userId },
+                    attributes: {
                         exclude: ['password']
                     }
                 })
@@ -107,8 +107,10 @@ let createNewUser = (data) => {
                 lastName: data.lastName,
                 address: data.address,
                 phonenumber: data.phonenumber,
-                gender: data.gender === '1' ? true : false,
-                roleId: data.roleId,
+                gender: data.gender,
+                roleId: data.role,
+                positionId: data.position,
+
             })
 
             resolve({
@@ -122,7 +124,7 @@ let createNewUser = (data) => {
 }
 
 let hashUserPassword = (password) => {
-    return new Promise(async (resolve, reject)=>{
+    return new Promise(async (resolve, reject) => {
         try {
             let hashPassword = await bcrypt.hashSync(password, salt);
             resolve(hashPassword);
@@ -132,20 +134,20 @@ let hashUserPassword = (password) => {
     })
 }
 
-let deleteUser = (userId) =>{
+let deleteUser = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await db.User.findOne({
-                where: {id: userId}
+                where: { id: userId }
             })
-    
+
             if (!user) {
                 resolve({
                     errCode: 2,
                     errMessage: `The user isn't exist!`
                 })
             }
-    
+
             user = db.User.build(user);
             await user.destroy();
             resolve({
@@ -158,10 +160,10 @@ let deleteUser = (userId) =>{
     })
 }
 
-let updateUserData =  (data) => {
+let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if(!data.id){
+            if (!data.id) {
                 resolve({
                     errCode: 2,
                     errMessage: 'Missing input parameters!'
@@ -169,7 +171,7 @@ let updateUserData =  (data) => {
             }
             console.log('id', data.id);
             let user = await db.User.findOne({
-                where: {id: data.id},
+                where: { id: data.id },
                 raw: false
             })
             if (user) {
@@ -183,7 +185,7 @@ let updateUserData =  (data) => {
                     message: 'Updated new users info!'
                 })
             }
-            else{
+            else {
                 resolve({
                     errCode: 1,
                     errMessage: `User not found!`
@@ -204,10 +206,10 @@ let getAllCodeService = (typeInput) => {
                     errMessage: 'Missing required parameter!'
                 });
             }
-            else{
+            else {
                 let response = {};
                 let allcode = await db.Allcode.findAll({
-                    where: {type: typeInput}
+                    where: { type: typeInput }
                 });
                 response.errCode = 0;
                 response.data = allcode;
