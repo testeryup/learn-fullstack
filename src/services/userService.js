@@ -163,11 +163,13 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id) {
+            console.log("data of editing user:", data);
+            if (!data.id || !data.role || !data.position || !data.gender || !data.phonenumber) {
                 resolve({
                     errCode: 2,
                     errMessage: 'Missing input parameters!'
-                })
+                });
+                return;
             }
             console.log('id', data.id);
             let user = await db.User.findOne({
@@ -178,6 +180,10 @@ let updateUserData = (data) => {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
                 user.address = data.address;
+                user.gender = data.gender;
+                user.phonenumber = data.phonenumber;
+                user.roleId = data.role;
+                user.positionId = data.position;
 
                 await user.save();
                 resolve({
