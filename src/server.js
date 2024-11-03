@@ -26,8 +26,9 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+// In server.js
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 viewEngine(app);
 initWebRoutes(app);
@@ -35,6 +36,6 @@ initWebRoutes(app);
 // connectDB();
 
 let port = process.env.PORT || 6969;
-app.listen(port, () =>{
+app.listen(port, () => {
     console.log("Running server at port:", port);
 })
