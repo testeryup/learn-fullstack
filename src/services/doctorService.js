@@ -1,5 +1,8 @@
-// import { where } from 'sequelize'
 import db from '../models/index'
+require('dotenv').config();
+import _ from 'lodash'
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
+
 let getTopDoctorHome = (limit) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -65,16 +68,16 @@ let saveDetailInforDoctor = (inputData) => {
                         doctorId: inputData.id
                     })
                 }
-                else if(inputData.action === 'EDIT'){
+                else if (inputData.action === 'EDIT') {
                     let doctorMarkdown = await db.Markdown.findOne({
-                        where: {doctorId: inputData.id},
+                        where: { doctorId: inputData.id },
                         raw: false
                     })
 
-                    if(doctorMarkdown){
-                        doctorMarkdown.contentHTML= inputData.contentHTML;
-                        doctorMarkdown.contentMarkdown= inputData.contentMarkdown;
-                        doctorMarkdown.description= inputData.description;
+                    if (doctorMarkdown) {
+                        doctorMarkdown.contentHTML = inputData.contentHTML;
+                        doctorMarkdown.contentMarkdown = inputData.contentMarkdown;
+                        doctorMarkdown.description = inputData.description;
                         // doctorMarkdown.updatedAt = new Date();
                         await doctorMarkdown.save();
                     }
@@ -133,6 +136,55 @@ let getDetailDoctorById = (id) => {
         }
     })
 }
+
+let bulkCreateSchedule = async (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data || !data.arrSchedule || !data.doctorId || !data.formattedDate) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required params!',
+                })
+            } else {
+                let schedules = data.arrSchedule;
+                if(schedules && schedules.length > 0){
+                    schedules.map(item => {
+                        item.maxNumber = MAX_NUMBER_SCHEDULE;
+                        return item;
+                    })
+                }
+                
+                let existing = await db.Schedule.findAll({
+                    where: {doctorId: data.doctorId, date: data.formattedDate},
+                    attribute: ['timeType', 'date', 'doctorId','maxNumber'],
+                    raw: true
+                })
+                if(existing && existing.length > 0){
+                    existing = existing.map(item => {
+                        item.date = new Date(item.date).getTime();
+                        return item;
+                    })
+                }
+                let toCreate = _.differenceWith(schedules, existing, (a, b) => {
+                    return a.timeType === b.timeType && a.date === b.date;
+                })
+                
+                if(toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(toCreate);
+                } 
+                console.log("check existing:", existing);
+                console.log("check to Create:", toCreate);
+                resolve({
+                    errCode: 0,
+                    errMessage: "OK"
+                });
+            }
+
+        } catch (error) {
+
+        }
+    })
+}
 module.exports = {
-    getTopDoctorHome, getAllDoctors, saveDetailInforDoctor, getDetailDoctorById
+    getTopDoctorHome, getAllDoctors, saveDetailInforDoctor, getDetailDoctorById, bulkCreateSchedule
 }
