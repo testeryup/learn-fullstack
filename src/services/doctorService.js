@@ -53,7 +53,9 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.id || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
+            if (!inputData.id || !inputData.contentHTML || !inputData.contentMarkdown ||
+                !inputData.action || !inputData.selectedPrice || !inputData.selectedProvince ||
+                !inputData.selectedPayment || !inputData.nameClinic || !inputData.addressClinic || !inputData.note) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameters!'
@@ -83,6 +85,35 @@ let saveDetailInforDoctor = (inputData) => {
                     }
                 }
 
+                let doctorInfor = await db.Doctor_Infor.findOne({
+                    where: {
+                        doctorId: inputData.id,
+                    },
+                    raw: false
+
+                })
+                if (doctorInfor) {
+                    doctorInfor.doctorId = inputData.id;
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+                    // doctorMarkdown.updatedAt = new Date();
+                    await doctorInfor.save();
+                }
+                else {
+                    await db.Doctor_Infor.create({
+                        doctorId: inputData.id,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    })
+                }
 
                 resolve({
                     errCode: 0,
