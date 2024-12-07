@@ -26,11 +26,20 @@ let sendEmail = async (dataSend) => {
         },
     });
     const info = await transporter.sendMail({
-        from: '"DANCHOI 👻" <haverdjonathan@gmail.com>', // sender address
+        from: '"Doctor 👻" <haverdjonathan@gmail.com>', // sender address
         to: dataSend.receiverEmail, // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
-        html: `
+        subject: "Order Confirmation ✔", // Subject line
+        // text: "Hello world?", // plain text body
+        html: getBodyHtml(dataSend.language, dataSend)
+        , // html body
+    });
+    console.log("email sent!", info);
+}
+
+let getBodyHtml = (language, dataSend) => {
+    let result = ``;
+    if(language === 'vi'){
+        result = `
             <h3>Xin chào ${dataSend.patientName}</h3>
             <p>Bạn nhận được Email này vì đã đặt lịch khám bệnh Online trên DatBooking 🩺</p>
             <p>Thông tin đặt lịch khám bệnh:</p>
@@ -40,14 +49,32 @@ let sendEmail = async (dataSend) => {
             <p>Nếu các thông tin trên là chính xác, bạn vui lòng xác nhận thông qua liên kết bên 
             dưới để hoàn tất thủ tục đặt lịch khám bệnh:
             </p>
-            <div style="background-color: red; border-radius: 5px; color: white;">
-                <a href='${dataSend.redirectLink}' target="_blank">Click here</a>
+            <div style="background-color: red; border-radius: 5px; padding: 5px 8px; display: inline-block;">
+                <a style="text-decoration: none; color: white; font-size: 1.25rem;" href='${dataSend.redirectLink}' target="_blank">Click here</a>
             </div>
             
             <div>Xin chân thành cảm ơn 🤩</div>
-        `, // html body
-    });
-    console.log("email sent!", info);
+        `;
+    }
+    else if(language === 'en'){
+        result = `
+            <h3>Dear ${dataSend.patientName}</h3>
+            <p>You received this email because you scheduled a medical examination appointment 🩺</p>
+            <p>Schedule information:</p>
+            <div><b>Time: ${dataSend.time}</b></div>
+            <div><b>Doctor: ${dataSend.doctorName}</b></div>
+
+            <p>If the above information is correct, please confirm the information via the link below to complete the procedure of 
+            setting up a medical examination appointment:
+            </p>
+            <div style="background-color: red; border-radius: 5px; padding: 5px 8px; display: inline-block;">
+                <a style="text-decoration: none; color: white; font-size: 1.25rem;" href='${dataSend.redirectLink}' target="_blank">Click here</a>
+            </div>
+
+            <div>Thank you 🤩</div>
+        `;
+    }
+    return result;
 }
 module.exports = {
     sendEmail

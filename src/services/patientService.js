@@ -5,18 +5,20 @@ require('dotenv').config();
 let postPatientBooking = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.email || !data.doctorId || !data.date || !data.timeType) {
+            if (!data.email || !data.doctorId || !data.date || !data.timeType || !data.fullName) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameters!'
                 })
             }
             else {
+                
                 await emailService.sendEmail({
                     receiverEmail: data.email,
-                    patientName: 'de tu hoidanit',
-                    time: '8:00 - 9:00 Thứ Sáu 06/12/2024',
-                    doctorName: 'Dat09',
+                    patientName: data.fullName,
+                    time: data.timeString,
+                    doctorName: data.doctorName,
+                    language: data.language,
                     redirectLink: 'https://github.com/testeryup'
                 });
                 const [user, created] = await db.User.findOrCreate({
