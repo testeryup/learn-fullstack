@@ -49,16 +49,37 @@ let getAllDoctors = () => {
         }
     })
 }
+let validateRequiredFields = (inputData) => {
+    const requiredFields = [
+        'id',
+        'contentHTML',
+        'contentMarkdown', 
+        'action',
+        'selectedPrice',
+        'selectedPayment',
+        'selectedProvince',
+        'nameClinic',
+        'addressClinic',
+        'note',
+        'specialtyId'
+    ];
+
+    const missingField = requiredFields.find(field => !inputData[field]);
+
+    return {
+        isValid: !missingField,
+        element: missingField || ''
+    };
+}
 
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.id || !inputData.contentHTML || !inputData.contentMarkdown ||
-                !inputData.action || !inputData.selectedPrice || !inputData.selectedProvince ||
-                !inputData.selectedPayment || !inputData.nameClinic || !inputData.addressClinic || !inputData.note) {
+            let required = validateRequiredFields(inputData);
+            if (!required.isValid) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing parameters!'
+                    errMessage: `Missing parameters: ${required.element} !`
                 })
             }
             else {
@@ -67,7 +88,9 @@ let saveDetailInforDoctor = (inputData) => {
                         contentHTML: inputData.contentHTML,
                         contentMarkdown: inputData.contentMarkdown,
                         description: inputData.description,
-                        doctorId: inputData.id
+                        doctorId: inputData.id,
+                        specialtyId: inputData.specialtyId,
+                        clinicId: inputData.clinicId
                     })
                 }
                 else if (inputData.action === 'EDIT') {
@@ -80,6 +103,8 @@ let saveDetailInforDoctor = (inputData) => {
                         doctorMarkdown.contentHTML = inputData.contentHTML;
                         doctorMarkdown.contentMarkdown = inputData.contentMarkdown;
                         doctorMarkdown.description = inputData.description;
+                        doctorMarkdown.specialtyId = inputData.specialtyId;
+                        doctorMarkdown.clinicId = inputData.clinicId;
                         // doctorMarkdown.updatedAt = new Date();
                         await doctorMarkdown.save();
                     }
@@ -100,7 +125,8 @@ let saveDetailInforDoctor = (inputData) => {
                     doctorInfor.nameClinic = inputData.nameClinic;
                     doctorInfor.addressClinic = inputData.addressClinic;
                     doctorInfor.note = inputData.note;
-                    // doctorMarkdown.updatedAt = new Date();
+                    doctorInfor.specialtyId= inputData.specialtyId,
+                    doctorInfor.clinicId= inputData.clinicId
                     await doctorInfor.save();
                 }
                 else {
@@ -112,6 +138,8 @@ let saveDetailInforDoctor = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
+                        specialtyId: inputData.specialtyId,
+                        clinicId: inputData.clinicId
                     })
                 }
 
