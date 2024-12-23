@@ -30,15 +30,14 @@ let sendEmail = async (dataSend) => {
         to: dataSend.receiverEmail, // list of receivers
         subject: "Order Confirmation ✔", // Subject line
         // text: "Hello world?", // plain text body
-        html: getBodyHtml(dataSend.language, dataSend)
+        html: getBodyHtml(dataSend)
         , // html body
     });
-    console.log("email sent!", info);
 }
 
-let getBodyHtml = (language, dataSend) => {
+let getBodyHtml = (dataSend) => {
     let result = ``;
-    if(language === 'vi'){
+    if(dataSend.language === 'vi'){
         result = `
             <h3>Xin chào ${dataSend.patientName}</h3>
             <p>Bạn nhận được Email này vì đã đặt lịch khám bệnh Online trên DatBooking 🩺</p>
@@ -56,7 +55,7 @@ let getBodyHtml = (language, dataSend) => {
             <div>Xin chân thành cảm ơn 🤩</div>
         `;
     }
-    else if(language === 'en'){
+    else if(dataSend.language === 'en'){
         result = `
             <h3>Dear ${dataSend.patientName}</h3>
             <p>You received this email because you scheduled a medical examination appointment 🩺</p>
@@ -76,6 +75,63 @@ let getBodyHtml = (language, dataSend) => {
     }
     return result;
 }
+let getBodyHtmlEmailRemedy = (dataSend) => {
+    let result = ``;
+    if(dataSend.language === 'vi'){
+        result = `
+            <h3>Xin chào ${dataSend.patientName}</h3>
+            <p>Bạn nhận được Email này vì đã đặt lịch khám bệnh Online thành công trên DatBooking 🩺</p>
+
+            <p>Thông tin đơn thuốc được gửi trên file đính kèm
+            </p>
+            <div style="background-color: red; border-radius: 5px; padding: 5px 8px; display: inline-block;">
+                <a style="text-decoration: none; color: white; font-size: 1.25rem;" href='${dataSend.redirectLink}' target="_blank">Click here</a>
+            </div>
+            
+            <div>Xin chân thành cảm ơn 🤩</div>
+        `;
+    }
+    else if(dataSend.language === 'en'){
+        result = `
+            <h3>Dear ${dataSend.patientName}</h3>
+            <p>You received this email because you successfully scheduled a medical examination appointment 🩺</p>
+            
+            <div style="background-color: red; border-radius: 5px; padding: 5px 8px; display: inline-block;">
+                <a style="text-decoration: none; color: white; font-size: 1.25rem;" href='${dataSend.redirectLink}' target="_blank">Click here</a>
+            </div>
+
+            <div>Thank you 🤩</div>
+        `;
+    }
+    return result;
+}
+let sendAttachment = async (dataSend) => {
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for port 465, false for other ports
+        auth: {
+            // user: "maddison53@ethereal.email",
+            // pass: "jn7jnAPss4f63QBp6D",
+            user: process.env.EMAIL_APP,
+            pass: process.env.EMAIL_APP_PASSWORD,
+        },
+    });
+    const info = await transporter.sendMail({
+        from: '"Doctor 👻" <haverdjonathan@gmail.com>', // sender address
+        to: dataSend.email, // list of receivers
+        subject: "Order Confirmation ✔", // Subject line
+        // text: "Hello world?", // plain text body
+        html: getBodyHtmlEmailRemedy(dataSend),
+        attachments: [
+            {   // encoded string as an attachment
+                filename: `remedy-${dataSend.patientId}-${new Date().getTime()}.jpeg`,
+                content: dataSend.imageBase64.split("base64,")[1],
+                encoding: 'base64'
+            }
+        ]
+    });
+}
 module.exports = {
-    sendEmail
+    sendEmail, sendAttachment
 }
